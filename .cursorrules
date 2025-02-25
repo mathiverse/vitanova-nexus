@@ -1,0 +1,20 @@
+# Cursor Rules for VitaNova Nexus Project
+
+# Enforce TypeScript for all React components
+*.jsx -> *.tsx
+
+# Enforce consistent formatting
+*.{ts,tsx,js,jsx} -> prettier --write
+
+# Enforce consistent imports
+*.{ts,tsx} -> eslint --fix
+
+# Enforce consistent component structure
+src/components/**/*.tsx -> Component structure should follow project guidelines
+
+# Enforce proper typing
+*.{ts,tsx} -> No 'any' types unless absolutely necessary
+
+# Enforce documentation
+src/components/**/*.tsx -> JSDoc comments for component props
+src/services/**/*.ts -> JSDoc comments for service functions 
