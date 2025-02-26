@@ -18,6 +18,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import WarningIcon from '@mui/icons-material/Warning';
+import LowPriorityIcon from '@mui/icons-material/LowPriority';
+import MediumPriorityIcon from '@mui/icons-material/MediumPriority';
 
 interface SidebarProps {
   toggleColorMode: () => void;
@@ -89,10 +92,12 @@ const Sidebar = ({ toggleColorMode, mode }: SidebarProps) => {
   const sidebarContent = (
     <>
       <SidebarHeader>
-        <MonitorHeartIcon sx={{ fontSize: 32, color: 'primary.main', mr: 2 }} />
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-          VitaNova Nexus
-        </Typography>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+          <MonitorHeartIcon sx={{ fontSize: 32, color: 'primary.main', mr: 2, cursor: 'pointer' }} />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
+            VitaNova Nexus
+          </Typography>
+        </Link>
         <Tooltip title={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}>
           <IconButton onClick={toggleColorMode} color="inherit" size="small">
             {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -141,13 +146,13 @@ const Sidebar = ({ toggleColorMode, mode }: SidebarProps) => {
         <Collapse in={monitoringOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding sx={{ pl: 2 }}>
             <NavItem component={Link} to="/high-risk" active={isActive('/high-risk')}>
-              <ListItemText primary="High Risk Inmates" />
+              <ListItemText primary="High Risk" />
             </NavItem>
             <NavItem component={Link} to="/medium-risk" active={isActive('/medium-risk')}>
-              <ListItemText primary="Medium Risk Inmates" />
+              <ListItemText primary="Medium Risk" />
             </NavItem>
             <NavItem component={Link} to="/low-risk" active={isActive('/low-risk')}>
-              <ListItemText primary="Low Risk Inmates" />
+              <ListItemText primary="Low Risk" />
             </NavItem>
           </List>
         </Collapse>

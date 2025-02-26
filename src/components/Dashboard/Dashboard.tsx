@@ -4,10 +4,10 @@ import {
   Table, TableBody, TableCell, TableContainer, 
   TableHead, TableRow, Button, InputBase,
   IconButton, Chip, Tooltip, CircularProgress,
-  useTheme, useMediaQuery
+  useTheme, useMediaQuery, Menu, MenuItem, Divider
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -142,18 +142,22 @@ const Dashboard = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [processingAI, setProcessingAI] = useState<boolean>(false);
+  const { riskType } = useParams<{ riskType: string }>();
+  const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
   
   // Calculate risk counts
   const highRiskCount = inmates.filter(inmate => inmate.riskLevel === 'HIGH').length;
   const mediumRiskCount = inmates.filter(inmate => inmate.riskLevel === 'MEDIUM').length;
   const lowRiskCount = inmates.filter(inmate => inmate.riskLevel === 'LOW').length;
   
-  // Filter inmates based on search term
-  const filteredInmates = inmates.filter(inmate => 
-    inmate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inmate.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inmate.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter inmates based on search term and riskType
+  const filteredInmates = inmates.filter(inmate => {
+    const matchesRiskType = riskType ? inmate.riskLevel.toLowerCase() === riskType : true;
+    const matchesSearchTerm = inmate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              inmate.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                              inmate.location.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesRiskType && matchesSearchTerm;
+  });
   
   useEffect(() => {
     // Generate initial data
@@ -177,6 +181,14 @@ const Dashboard = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleFilterClose = () => {
+    setFilterAnchorEl(null);
+  };
 
   return (
     <Box>
@@ -279,7 +291,10 @@ const Dashboard = () => {
             </SearchBar>
             
             <Tooltip title="Filter list">
-              <IconButton size={isMobile ? "small" : "medium"}>
+              <IconButton 
+                size={isMobile ? "small" : "medium"}
+                onClick={handleFilterClick}
+              >
                 <FilterListIcon />
               </IconButton>
             </Tooltip>
@@ -401,6 +416,38 @@ const Dashboard = () => {
           </Table>
         </TableContainer>
       </GlassTable>
+
+      <Menu
+        anchorEl={filterAnchorEl}
+        open={Boolean(filterAnchorEl)}
+        onClose={handleFilterClose}
+      >
+        <MenuItem onClick={() => {
+          // Apply filter logic here
+          handleFilterClose();
+        }}>
+          High Risk Only
+        </MenuItem>
+        <MenuItem onClick={() => {
+          // Apply filter logic here
+          handleFilterClose();
+        }}>
+          Medium Risk Only
+        </MenuItem>
+        <MenuItem onClick={() => {
+          // Apply filter logic here
+          handleFilterClose();
+        }}>
+          Low Risk Only
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => {
+          // Clear filters
+          handleFilterClose();
+        }}>
+          Clear Filters
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

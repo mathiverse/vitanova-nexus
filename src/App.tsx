@@ -1,12 +1,15 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Container, GlobalStyles, useMediaQuery } from '@mui/material';
+import { Box, Container, GlobalStyles, useMediaQuery, Typography } from '@mui/material';
 import { useState, useMemo } from 'react';
 import Dashboard from './components/Dashboard/Dashboard';
 import UserMonitor from './components/Monitoring/UserMonitor';
 import Sidebar from './components/Common/Sidebar';
 import './App.css';
+import Reports from './components/Reports/Reports';
+import Settings from './components/Settings/Settings';
 
 function App() {
   // Use system preference for initial theme mode
@@ -15,7 +18,7 @@ function App() {
 
   // Toggle theme function
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'dark'));
   };
 
   // Create a theme with dynamic color mode
@@ -133,6 +136,9 @@ function App() {
           background: mode === 'dark' ? 'rgba(96, 165, 250, 0.1)' : 'rgba(37, 99, 235, 0.1)',
           boxShadow: mode === 'dark' ? '0 0 10px rgba(96, 165, 250, 0.2)' : '0 0 10px rgba(37, 99, 235, 0.2)',
           animation: 'float 8s infinite ease-in-out',
+          opacity: 0.15,
+          pointerEvents: 'none',
+          zIndex: 0,
         },
         '.particle-1': {
           width: '80px',
@@ -246,9 +252,9 @@ function App() {
                 <Route path="/high-risk" element={<Dashboard />} />
                 <Route path="/medium-risk" element={<Dashboard />} />
                 <Route path="/low-risk" element={<Dashboard />} />
-                <Route path="/reports" element={<div>Reports Page</div>} />
-                <Route path="/notifications" element={<div>Notifications Page</div>} />
-                <Route path="/settings" element={<div>Settings Page</div>} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/notifications" element={<Typography variant="h4">Notifications Page</Typography>} />
+                <Route path="/settings" element={<Settings />} />
               </Routes>
             </Container>
           </Box>
