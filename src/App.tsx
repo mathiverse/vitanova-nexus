@@ -18,7 +18,7 @@ function App() {
 
   // Toggle theme function
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'dark'));
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
   // Create a theme with dynamic color mode
@@ -249,9 +249,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/monitor/:id" element={<UserMonitor />} />
-                <Route path="/high-risk" element={<Dashboard />} />
-                <Route path="/medium-risk" element={<Dashboard />} />
-                <Route path="/low-risk" element={<Dashboard />} />
+                <Route path="/high-risk" element={<Dashboard initialRiskLevel="HIGH" />} />
+                <Route path="/medium-risk" element={<Dashboard initialRiskLevel="MEDIUM" />} />
+                <Route path="/low-risk" element={<Dashboard initialRiskLevel="LOW" />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/notifications" element={<Typography variant="h4">Notifications Page</Typography>} />
                 <Route path="/settings" element={<Settings />} />

@@ -7,7 +7,7 @@ import {
   useTheme, useMediaQuery, Menu, MenuItem, Divider
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -132,10 +132,14 @@ const AIProcessingIndicator = styled(Box)(({ theme }) => ({
   },
 }));
 
+interface DashboardProps {
+  initialRiskLevel?: 'HIGH' | 'MEDIUM' | 'LOW';
+}
+
 /**
  * Dashboard component showing inmate monitoring overview
  */
-const Dashboard = () => {
+const Dashboard = ({ initialRiskLevel }: DashboardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [inmates, setInmates] = useState<Inmate[]>([]);
@@ -144,6 +148,9 @@ const Dashboard = () => {
   const [processingAI, setProcessingAI] = useState<boolean>(false);
   const { riskType } = useParams<{ riskType: string }>();
   const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedRiskLevel, setSelectedRiskLevel] = useState<string | null>(initialRiskLevel || null);
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // Calculate risk counts
   const highRiskCount = inmates.filter(inmate => inmate.riskLevel === 'HIGH').length;
@@ -152,11 +159,16 @@ const Dashboard = () => {
   
   // Filter inmates based on search term and riskType
   const filteredInmates = inmates.filter(inmate => {
-    const matchesRiskType = riskType ? inmate.riskLevel.toLowerCase() === riskType : true;
-    const matchesSearchTerm = inmate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              inmate.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              inmate.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesRiskType && matchesSearchTerm;
+    // First apply risk level filter if selected
+    if (selectedRiskLevel && inmate.riskLevel !== selectedRiskLevel) {
+      return false;
+    }
+    
+    // Then apply search filter
+    return searchTerm === '' || 
+      inmate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inmate.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inmate.location.toLowerCase().includes(searchTerm.toLowerCase());
   });
   
   useEffect(() => {
@@ -181,6 +193,19 @@ const Dashboard = () => {
     
     return () => clearInterval(interval);
   }, []);
+
+  // Determine initial risk level from URL
+  useEffect(() => {
+    if (location.pathname === '/high-risk') {
+      setSelectedRiskLevel('HIGH');
+    } else if (location.pathname === '/medium-risk') {
+      setSelectedRiskLevel('MEDIUM');
+    } else if (location.pathname === '/low-risk') {
+      setSelectedRiskLevel('LOW');
+    } else {
+      setSelectedRiskLevel(null);
+    }
+  }, [location.pathname]);
 
   const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setFilterAnchorEl(event.currentTarget);
@@ -423,26 +448,30 @@ const Dashboard = () => {
         onClose={handleFilterClose}
       >
         <MenuItem onClick={() => {
-          // Apply filter logic here
+          setSelectedRiskLevel('HIGH');
+          navigate('/high-risk');
           handleFilterClose();
         }}>
           High Risk Only
         </MenuItem>
         <MenuItem onClick={() => {
-          // Apply filter logic here
+          setSelectedRiskLevel('MEDIUM');
+          navigate('/medium-risk');
           handleFilterClose();
         }}>
           Medium Risk Only
         </MenuItem>
         <MenuItem onClick={() => {
-          // Apply filter logic here
+          setSelectedRiskLevel('LOW');
+          navigate('/low-risk');
           handleFilterClose();
         }}>
           Low Risk Only
         </MenuItem>
         <Divider />
         <MenuItem onClick={() => {
-          // Clear filters
+          setSelectedRiskLevel(null);
+          navigate('/');
           handleFilterClose();
         }}>
           Clear Filters
