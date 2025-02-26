@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { 
   Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, 
   ListItemText, Divider, Avatar, Typography, IconButton,
-  Collapse, Switch, Tooltip
+  Collapse, Switch, Tooltip, useTheme
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import { Link, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
@@ -20,11 +20,15 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import WarningIcon from '@mui/icons-material/Warning';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
-import MediumPriorityIcon from '@mui/icons-material/MediumPriority';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
 interface SidebarProps {
   toggleColorMode: () => void;
   mode: 'light' | 'dark';
+  mobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
 // Styled components for glassmorphism effect
@@ -73,18 +77,14 @@ const NavItem = styled(ListItemButton)<{ active?: number }>(({ theme, active }) 
 /**
  * Modern sidebar navigation component with glassmorphism effect
  */
-const Sidebar = ({ toggleColorMode, mode }: SidebarProps) => {
+const Sidebar = ({ toggleColorMode, mode, mobileOpen, onMobileClose }: SidebarProps) => {
+  const theme = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(true);
   const [monitoringOpen, setMonitoringOpen] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleMonitoringClick = () => {
     setMonitoringOpen(!monitoringOpen);
-  };
-
-  const toggleMobileDrawer = () => {
-    setMobileOpen(!mobileOpen);
   };
 
   const isActive = (path: string) => location.pathname === path ? 1 : 0;
@@ -144,14 +144,40 @@ const Sidebar = ({ toggleColorMode, mode }: SidebarProps) => {
         </ListItem>
 
         <Collapse in={monitoringOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding sx={{ pl: 2 }}>
-            <NavItem component={Link} to="/high-risk" active={isActive('/high-risk')}>
+          <List component="div" disablePadding>
+            <NavItem 
+              component={Link} 
+              to="/high-risk" 
+              active={isActive('/high-risk')}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon>
+                <WarningIcon color="error" fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary="High Risk" />
             </NavItem>
-            <NavItem component={Link} to="/medium-risk" active={isActive('/medium-risk')}>
+
+            <NavItem 
+              component={Link} 
+              to="/medium-risk" 
+              active={isActive('/medium-risk')}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon>
+                <WarningAmberIcon color="warning" fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary="Medium Risk" />
             </NavItem>
-            <NavItem component={Link} to="/low-risk" active={isActive('/low-risk')}>
+
+            <NavItem 
+              component={Link} 
+              to="/low-risk" 
+              active={isActive('/low-risk')}
+              sx={{ pl: 4 }}
+            >
+              <ListItemIcon>
+                <LowPriorityIcon color="success" fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary="Low Risk" />
             </NavItem>
           </List>
@@ -183,28 +209,24 @@ const Sidebar = ({ toggleColorMode, mode }: SidebarProps) => {
 
   return (
     <>
-      {/* Mobile hamburger menu */}
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        edge="start"
-        onClick={toggleMobileDrawer}
-        sx={{ mr: 2, display: { sm: 'none' } }}
-      >
-        <MenuIcon />
-      </IconButton>
-
       {/* Mobile drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
-        onClose={toggleMobileDrawer}
+        onClose={onMobileClose}
         ModalProps={{ keepMounted: true }}
-        sx={{ display: { xs: 'block', sm: 'none' } }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: 280,
+            backgroundImage: 'none',
+            bgcolor: alpha(theme.palette.background.paper, 0.7),
+            backdropFilter: 'blur(10px)',
+          },
+        }}
       >
-        <Box sx={{ width: 280 }}>
-          {sidebarContent}
-        </Box>
+        {sidebarContent}
       </Drawer>
 
       {/* Desktop sidebar */}

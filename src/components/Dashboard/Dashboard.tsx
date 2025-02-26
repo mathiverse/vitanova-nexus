@@ -47,13 +47,23 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     transition: 'background-color 0.2s ease',
   },
   transition: 'background-color 0.2s ease',
+  [theme.breakpoints.down('sm')]: {
+    height: '60px', // Increase row height on mobile
+  }
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
   padding: theme.spacing(1.5),
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(1.2),
+    fontSize: '0.875rem', // Slightly smaller font on mobile
+    '&:first-of-type': {
+      paddingLeft: theme.spacing(1.5)
+    },
+    '&:last-of-type': {
+      paddingRight: theme.spacing(1.5)
+    }
   },
 }));
 
@@ -216,64 +226,131 @@ const Dashboard = ({ initialRiskLevel }: DashboardProps) => {
   };
 
   return (
-    <Box>
-      <Box sx={{ 
+    <Box sx={{ 
+      width: '100%',
+      px: { xs: 0, sm: 2 }, // Remove padding on mobile
+    }}>
+      <Box sx={{
+        mb: 3, 
         display: 'flex', 
-        alignItems: 'center', 
         justifyContent: 'space-between',
-        mb: 3,
+        alignItems: 'center',
         flexWrap: 'wrap',
-        gap: 2
+        gap: 2,
+        [theme.breakpoints.down('sm')]: {
+          mb: 2
+        }
       }}>
         <Typography 
           variant={isMobile ? "h5" : "h4"} 
           component="h1" 
           fontWeight="bold"
-          sx={{ 
-            background: theme.palette.mode === 'dark' 
-              ? 'linear-gradient(90deg, #e2e8f0, #94a3b8)' 
-              : 'linear-gradient(90deg, #1e293b, #334155)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textFillColor: 'transparent',
+          sx={{
+            [theme.breakpoints.down('sm')]: {
+              width: '100%',
+              mb: 1
+            }
           }}
         >
-          Inmate Monitoring Dashboard
+          Monitored Individuals
         </Typography>
         
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          backgroundColor: alpha(theme.palette.background.paper, 0.7),
-          backdropFilter: 'blur(10px)',
-          borderRadius: 2,
-          px: 2,
-          py: 0.5,
-          border: `1px solid ${alpha(
-            theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black,
-            theme.palette.mode === 'dark' ? 0.1 : 0.05
-          )}`,
-        }}>
-          <Box sx={{ 
-            width: 10, 
-            height: 10, 
-            borderRadius: '50%', 
-            bgcolor: 'success.main',
-            mr: 1,
-            animation: 'pulse 1.5s infinite',
-          }} />
-          <Typography variant="body2" color="text.secondary">
-            Live Data
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            [theme.breakpoints.down('sm')]: {
+              width: '100%',
+              justifyContent: 'space-between'
+            }
+          }}
+        >
+          <SearchBar>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search inmates…"
+              inputProps={{ 'aria-label': 'search' }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchBar>
+          
+          <Box sx={{ display: 'flex' }}>
+            <Tooltip title="Filter list">
+              <IconButton 
+                size="small"
+                onClick={handleFilterClick}
+              >
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title="Refresh data">
+              <IconButton 
+                onClick={() => setInmates(generateInmates(15))}
+                size="small"
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
       
-      <DashboardSummary 
+      <Box sx={{ mb: 3 }}>
+        {selectedRiskLevel && (
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              mb: 2,
+              p: 1.5,
+              bgcolor: alpha(
+                selectedRiskLevel === 'HIGH' 
+                  ? theme.palette.error.main 
+                  : selectedRiskLevel === 'MEDIUM'
+                    ? theme.palette.warning.main
+                    : theme.palette.success.main, 
+                0.1
+              ),
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500, mr: 1 }}>
+              {selectedRiskLevel === 'HIGH' 
+                ? 'Showing High Risk Individuals' 
+                : selectedRiskLevel === 'MEDIUM' 
+                  ? 'Showing Medium Risk Individuals' 
+                  : 'Showing Low Risk Individuals'}
+            </Typography>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              onClick={() => {
+                setSelectedRiskLevel(null);
+                navigate('/');
+              }}
+              sx={{ 
+                ml: 'auto', 
+                borderRadius: 10,
+                fontSize: '0.7rem',
+                py: 0.25,
+                px: 1,
+              }}
+            >
+              Clear Filter
+            </Button>
+          </Box>
+        )}
+      </Box>
+      
+      <DashboardSummary
+        totalCount={inmates.length}
         highRiskCount={highRiskCount}
         mediumRiskCount={mediumRiskCount}
         lowRiskCount={lowRiskCount}
-        totalCount={inmates.length}
       />
       
       <GlassTable sx={{ mt: 4 }}>
@@ -335,8 +412,17 @@ const Dashboard = ({ initialRiskLevel }: DashboardProps) => {
           </Box>
         </Box>
         
-        <TableContainer>
-          <Table size={isMobile ? "small" : "medium"}>
+        <TableContainer sx={{
+          [theme.breakpoints.down('sm')]: {
+            margin: '-8px', // Negative margin to extend to edges
+            width: 'calc(100% + 16px)',
+          },
+        }}>
+          <Table size={isMobile ? "small" : "medium"} sx={{
+            [theme.breakpoints.down('sm')]: {
+              tableLayout: 'fixed',
+            }
+          }}>
             <TableHead>
               <TableRow>
                 <StyledTableCell>ID</StyledTableCell>
@@ -386,25 +472,22 @@ const Dashboard = ({ initialRiskLevel }: DashboardProps) => {
                     </StyledTableCell>
                   )}
                   <StyledTableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ 
+                      width: '100%', 
+                      maxWidth: isMobile ? 45 : 60,
+                      height: 6, 
+                      bgcolor: alpha(theme.palette.text.disabled, 0.3),
+                      borderRadius: 3,
+                      mr: 1,
+                    }}>
                       <Box sx={{ 
-                        width: '100%', 
-                        maxWidth: 60,
-                        height: 6, 
-                        bgcolor: alpha(theme.palette.text.disabled, 0.3),
+                        height: '100%', 
+                        width: `${inmate.stressLevel}%`,
                         borderRadius: 3,
-                        mr: 1,
-                      }}>
-                        <Box sx={{ 
-                          height: '100%', 
-                          width: `${inmate.stressLevel}%`,
-                          borderRadius: 3,
-                          bgcolor: 
-                            inmate.stressLevel > 70 ? 'error.main' : 
-                            inmate.stressLevel > 50 ? 'warning.main' : 'success.main',
-                        }} />
-                      </Box>
-                      {Math.round(inmate.stressLevel)}%
+                        bgcolor: 
+                          inmate.stressLevel > 70 ? 'error.main' : 
+                          inmate.stressLevel > 50 ? 'warning.main' : 'success.main',
+                      }} />
                     </Box>
                   </StyledTableCell>
                   {!isMobile && (
@@ -429,6 +512,11 @@ const Dashboard = ({ initialRiskLevel }: DashboardProps) => {
                         boxShadow: 'none',
                         '&:hover': {
                           boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                        },
+                        [theme.breakpoints.down('sm')]: {
+                          minWidth: '80px',
+                          fontWeight: 500,
+                          py: 0.5
                         }
                       }}
                     >

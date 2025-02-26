@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Container, GlobalStyles, useMediaQuery, Typography } from '@mui/material';
+import { Box, Container, GlobalStyles, useMediaQuery, Typography, IconButton, alpha } from '@mui/material';
 import { useState, useMemo } from 'react';
 import Dashboard from './components/Dashboard/Dashboard';
 import UserMonitor from './components/Monitoring/UserMonitor';
@@ -10,11 +10,17 @@ import Sidebar from './components/Common/Sidebar';
 import './App.css';
 import Reports from './components/Reports/Reports';
 import Settings from './components/Settings/Settings';
+import MenuIcon from '@mui/icons-material/Menu';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 function App() {
   // Use system preference for initial theme mode
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [mode, setMode] = useState<'light' | 'dark'>(prefersDarkMode ? 'dark' : 'light');
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Toggle theme function
   const toggleColorMode = () => {
@@ -231,7 +237,12 @@ function App() {
           <Box className="particle particle-5" />
           <Box className="particle particle-6" />
           
-          <Sidebar toggleColorMode={toggleColorMode} mode={mode} />
+          <Sidebar 
+            toggleColorMode={toggleColorMode} 
+            mode={mode} 
+            mobileOpen={mobileOpen}
+            onMobileClose={() => setMobileOpen(false)}
+          />
           <Box
             component="main"
             sx={{
@@ -239,6 +250,7 @@ function App() {
               p: 3,
               width: { sm: `calc(100% - 280px)` },
               ml: { sm: '280px' },
+              mt: { xs: '56px', sm: 0 },
               overflow: 'auto',
               backdropFilter: 'blur(5px)',
               position: 'relative',
@@ -257,6 +269,75 @@ function App() {
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Container>
+          </Box>
+          {/* Mobile header - only visible on small screens */}
+          <Box 
+            sx={{ 
+              display: { xs: 'flex', sm: 'none' }, 
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 56,
+              bgcolor: alpha(theme.palette.background.paper, 0.8),
+              backdropFilter: 'blur(10px)',
+              zIndex: 1100,
+              px: 2,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`
+            }}
+          >
+            <Box 
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <IconButton 
+                color="inherit" 
+                aria-label="open drawer" 
+                edge="start" 
+                onClick={() => setMobileOpen(!mobileOpen)}
+                sx={{ mr: 1.5 }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <MonitorHeartIcon 
+                sx={{ 
+                  fontSize: 24, 
+                  color: 'primary.main', 
+                  mr: 1.5 
+                }} 
+              />
+              <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
+                VitaNova Nexus
+              </Typography>
+            </Box>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <IconButton 
+                color="inherit" 
+                sx={{ 
+                  mr: 1.5,
+                  position: 'relative',
+                }}
+              >
+                <NotificationsIcon />
+                <Box sx={{ 
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  width: 8,
+                  height: 8,
+                  bgcolor: 'error.main',
+                  borderRadius: '50%',
+                }} />
+              </IconButton>
+              <IconButton onClick={toggleColorMode} color="inherit">
+                {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
+            </Box>
           </Box>
         </Box>
       </Router>

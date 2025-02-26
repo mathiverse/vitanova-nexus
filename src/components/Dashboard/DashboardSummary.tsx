@@ -1,27 +1,26 @@
-import { Grid, Paper, Typography, Box, useTheme, useMediaQuery } from '@mui/material';
+import React from 'react';
+import { Box, Paper, Typography, Grid, useTheme, useMediaQuery } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import WarningIcon from '@mui/icons-material/Warning';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PeopleIcon from '@mui/icons-material/People';
+import ReportIcon from '@mui/icons-material/Report';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
 interface DashboardSummaryProps {
+  totalCount: number;
   highRiskCount: number;
   mediumRiskCount: number;
   lowRiskCount: number;
-  totalCount: number;
 }
 
-// Styled components for glassmorphism effect
 const GlassCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: 'flex',
-  flexDirection: 'column',
-  height: 'auto',
-  minHeight: 160,
   backgroundColor: alpha(theme.palette.background.paper, 0.7),
   backdropFilter: 'blur(10px)',
   borderRadius: 16,
+  overflow: 'hidden',
   border: `1px solid ${alpha(
     theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black,
     theme.palette.mode === 'dark' ? 0.1 : 0.05
@@ -29,259 +28,383 @@ const GlassCard = styled(Paper)(({ theme }) => ({
   boxShadow: theme.palette.mode === 'dark'
     ? '0 8px 32px rgba(0, 0, 0, 0.3)'
     : '0 8px 32px rgba(0, 0, 0, 0.1)',
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  transition: 'transform 0.2s ease-in-out',
   '&:hover': {
     transform: 'translateY(-5px)',
-    boxShadow: theme.palette.mode === 'dark'
-      ? '0 12px 40px rgba(0, 0, 0, 0.4)'
-      : '0 12px 40px rgba(0, 0, 0, 0.12)',
+  },
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+}));
+
+const StatusIndicator = styled(Box)(({ theme }) => ({
+  height: 4,
+  width: '100%',
+  marginTop: 'auto',
+}));
+
+const AnimatedGradientCard = styled(GlassCard)(({ theme }) => ({
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-50%',
+    width: '200%',
+    height: '100%',
+    background: 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent)',
+    transform: 'translateX(-100%)',
+    transition: 'transform 0.8s ease',
+  },
+  '&:hover::before': {
+    transform: 'translateX(100%)',
   },
 }));
 
-const IconContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 48,
-  height: 48,
-  borderRadius: '50%',
-  marginRight: theme.spacing(2),
-  flexShrink: 0,
-}));
-
 /**
- * Summary component showing risk level distribution with modern glassmorphism design
+ * Dashboard summary component showing inmate count by risk level
  */
-const DashboardSummary = ({ 
-  highRiskCount, 
-  mediumRiskCount, 
-  lowRiskCount,
-  totalCount 
+const DashboardSummary = ({
+  totalCount,
+  highRiskCount,
+  mediumRiskCount,
+  lowRiskCount
 }: DashboardSummaryProps) => {
   const theme = useTheme();
-  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} sm={6} md={3}>
-        <GlassCard sx={{ 
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(96, 165, 250, 0.05))'
-            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(37, 99, 235, 0.05))',
+    <Grid container spacing={isMobile ? 0.5 : 3} sx={{ mb: isMobile ? 1 : 4 }}>
+      <Grid item xs={6} sm={6} md={3}>
+        <AnimatedGradientCard sx={{ 
+          position: 'relative',
+          p: isMobile ? 1 : 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: isMobile ? 'center' : 'flex-start',
         }}>
-          <Box display="flex" alignItems="center" mb={2} flexWrap={isXs ? 'wrap' : 'nowrap'}>
-            <IconContainer sx={{ 
-              bgcolor: 'primary.light', 
-              color: 'primary.contrastText',
-              mb: isXs ? 1 : 0,
-              mr: isXs ? 0 : 2,
-              mx: isXs ? 'auto' : undefined
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 0.5,
+            flexDirection: isMobile ? 'column' : 'row',
+            textAlign: 'center',
+            width: '100%'
+          }}>
+            <Box sx={{ 
+              backgroundColor: alpha(theme.palette.primary.main, 0.2),
+              borderRadius: '50%',
+              width: isMobile ? 28 : 56,
+              height: isMobile ? 28 : 56,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: isMobile ? 0 : 2,
+              mb: isMobile ? 0.5 : 0
             }}>
-              <PeopleAltIcon />
-            </IconContainer>
+              <PeopleIcon 
+                sx={{ 
+                  color: theme.palette.primary.main,
+                  fontSize: isMobile ? 16 : 32,
+                }} 
+              />
+            </Box>
             <Typography 
-              variant="h6" 
               color="primary.main" 
-              fontWeight="medium"
-              textAlign={isXs ? 'center' : 'left'}
-              width={isXs ? '100%' : 'auto'}
+              variant={isMobile ? "body2" : "h5"}
+              noWrap
+              sx={{ 
+                fontWeight: 'bold',
+                fontSize: isMobile ? '0.65rem' : undefined,
+                lineHeight: 1.1,
+                width: '100%',
+                textAlign: 'center',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
             >
-              Total Monitored
+              {isMobile ? 'Total' : 'Total Monitored'}
             </Typography>
           </Box>
+
           <Typography 
-            component="p" 
-            variant="h3" 
-            color="primary.main" 
-            fontWeight="bold"
-            textAlign={isXs ? 'center' : 'left'}
-            sx={{ wordBreak: 'break-word' }}
+            variant={isMobile ? "h5" : "h2"} 
+            component="div" 
+            noWrap
+            sx={{ 
+              color: theme.palette.primary.main,
+              fontWeight: 'bold',
+              my: isMobile ? 0.2 : 2,
+              lineHeight: 1,
+              textAlign: 'center',  
+              fontSize: isMobile ? '1.25rem' : undefined,
+              maxWidth: '100%'
+            }}
           >
             {totalCount}
           </Typography>
+
+          {theme.breakpoints.up('md') && (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              mb: 1,
+              color: theme.palette.success.main
+            }}>
+              <TrendingUpIcon sx={{ fontSize: 14, mr: 0.5 }} />
+              <Typography variant="caption" fontWeight="medium">
+                +12% from last week
+              </Typography>
+            </Box>
+          )}
+
           <Typography 
             variant="body2" 
+            color="text.secondary"
+            noWrap
             sx={{ 
-              mt: 1, 
-              color: 'text.secondary',
-              textAlign: isXs ? 'center' : 'left'
+              mb: 0.5,
+              fontSize: isMobile ? '0.6rem' : '0.75rem',
+              textAlign: 'center',
+              width: '100%',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
             }}
           >
             Active monitoring
           </Typography>
-          <Box sx={{ 
-            height: 4, 
-            width: '100%', 
-            mt: 'auto', 
-            borderRadius: 2,
-            background: 'linear-gradient(90deg, #3b82f6, #60a5fa)'
-          }} />
-        </GlassCard>
+
+          <StatusIndicator sx={{ bgcolor: theme.palette.primary.main }} />
+        </AnimatedGradientCard>
       </Grid>
-      
-      <Grid item xs={12} sm={6} md={3}>
-        <GlassCard sx={{ 
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(248, 113, 113, 0.05))'
-            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(239, 68, 68, 0.05))',
+
+      <Grid item xs={6} sm={6} md={3}>
+        <AnimatedGradientCard sx={{ 
+          position: 'relative',
+          p: isMobile ? 1.5 : 3, 
         }}>
-          <Box display="flex" alignItems="center" mb={2} flexWrap={isXs ? 'wrap' : 'nowrap'}>
-            <IconContainer sx={{ 
-              bgcolor: 'error.light', 
-              color: 'error.contrastText',
-              mb: isXs ? 1 : 0,
-              mr: isXs ? 0 : 2,
-              mx: isXs ? 'auto' : undefined
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 0.5,
+            flexDirection: isMobile ? 'column' : 'row',
+            textAlign: 'center',
+            width: '100%'
+          }}>
+            <Box sx={{ 
+              backgroundColor: alpha(theme.palette.error.main, 0.2),
+              borderRadius: '50%',
+              width: isMobile ? 32 : 56,
+              height: isMobile ? 32 : 56,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: isMobile ? 0 : 2,
+              mb: isMobile ? 1 : 0
             }}>
-              <WarningIcon />
-            </IconContainer>
+              <ReportIcon 
+                sx={{ 
+                  color: theme.palette.error.main,
+                  fontSize: isMobile ? 20 : 32,
+                }} 
+              />
+            </Box>
             <Typography 
-              variant="h6" 
               color="error.main" 
-              fontWeight="medium"
-              textAlign={isXs ? 'center' : 'left'}
-              width={isXs ? '100%' : 'auto'}
+              variant={isMobile ? "subtitle1" : "h5"}
+              sx={{ 
+                fontWeight: 'bold',
+                fontSize: isMobile ? '0.875rem' : undefined,
+                lineHeight: 1.2
+              }}
             >
               High Risk
             </Typography>
           </Box>
+
           <Typography 
-            component="p" 
-            variant="h3" 
-            color="error.main" 
-            fontWeight="bold"
-            textAlign={isXs ? 'center' : 'left'}
+            variant={isMobile ? "h4" : "h2"} 
+            component="div" 
+            sx={{ 
+              color: theme.palette.error.main,
+              fontWeight: 'bold',
+              my: isMobile ? 0.5 : 2,
+              lineHeight: 1,
+              textAlign: isMobile ? 'center' : 'left',
+              fontSize: isMobile ? '2rem' : undefined,
+            }}
           >
             {highRiskCount}
           </Typography>
+
           <Typography 
             variant="body2" 
+            color="text.secondary"
             sx={{ 
-              mt: 1, 
-              color: 'text.secondary',
-              textAlign: isXs ? 'center' : 'left'
+              mb: 1,
+              fontSize: isMobile ? '0.675rem' : '0.75rem',
+              textAlign: isMobile ? 'center' : 'left',
+              whiteSpace: 'nowrap'
             }}
           >
             Require immediate attention
           </Typography>
-          <Box sx={{ 
-            height: 4, 
-            width: '100%', 
-            mt: 'auto', 
-            borderRadius: 2,
-            background: 'linear-gradient(90deg, #b91c1c, #ef4444)'
-          }} />
-        </GlassCard>
+
+          <StatusIndicator sx={{ bgcolor: theme.palette.error.main }} />
+        </AnimatedGradientCard>
       </Grid>
-      
-      <Grid item xs={12} sm={6} md={3}>
-        <GlassCard sx={{ 
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(251, 191, 36, 0.05))'
-            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(245, 158, 11, 0.05))',
+
+      <Grid item xs={6} sm={6} md={3}>
+        <AnimatedGradientCard sx={{ 
+          position: 'relative',
+          p: isMobile ? 1.5 : 3, 
         }}>
-          <Box display="flex" alignItems="center" mb={2} flexWrap={isXs ? 'wrap' : 'nowrap'}>
-            <IconContainer sx={{ 
-              bgcolor: 'warning.light', 
-              color: 'warning.contrastText',
-              mb: isXs ? 1 : 0,
-              mr: isXs ? 0 : 2,
-              mx: isXs ? 'auto' : undefined
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 0.5,
+            flexDirection: isMobile ? 'column' : 'row',
+            textAlign: 'center',
+            width: '100%'
+          }}>
+            <Box sx={{ 
+              backgroundColor: alpha(theme.palette.warning.main, 0.2),
+              borderRadius: '50%',
+              width: isMobile ? 32 : 56,
+              height: isMobile ? 32 : 56,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: isMobile ? 0 : 2,
+              mb: isMobile ? 1 : 0
             }}>
-              <ReportProblemIcon />
-            </IconContainer>
+              <PriorityHighIcon 
+                sx={{ 
+                  color: theme.palette.warning.main,
+                  fontSize: isMobile ? 20 : 32,
+                }} 
+              />
+            </Box>
             <Typography 
-              variant="h6" 
               color="warning.main" 
-              fontWeight="medium"
-              textAlign={isXs ? 'center' : 'left'}
-              width={isXs ? '100%' : 'auto'}
+              variant={isMobile ? "body2" : "h5"}
+              sx={{ 
+                fontWeight: 'bold',
+                fontSize: isMobile ? '0.75rem' : undefined,
+                lineHeight: 1.1
+              }}
             >
-              Medium Risk
+              {isMobile ? 'Med Risk' : 'Medium Risk'}
             </Typography>
           </Box>
+
           <Typography 
-            component="p" 
-            variant="h3" 
-            color="warning.main" 
-            fontWeight="bold"
-            textAlign={isXs ? 'center' : 'left'}
+            variant={isMobile ? "h4" : "h2"} 
+            component="div" 
+            sx={{ 
+              color: theme.palette.warning.main,
+              fontWeight: 'bold',
+              my: isMobile ? 0.5 : 2,
+              lineHeight: 1,
+              textAlign: isMobile ? 'center' : 'left',
+              fontSize: isMobile ? '2rem' : undefined,
+            }}
           >
             {mediumRiskCount}
           </Typography>
+
           <Typography 
             variant="body2" 
+            color="text.secondary"
             sx={{ 
-              mt: 1, 
-              color: 'text.secondary',
-              textAlign: isXs ? 'center' : 'left'
+              mb: 1,
+              fontSize: isMobile ? '0.675rem' : '0.75rem',
+              textAlign: isMobile ? 'center' : 'left',
+              whiteSpace: 'nowrap'
             }}
           >
             Require monitoring
           </Typography>
-          <Box sx={{ 
-            height: 4, 
-            width: '100%', 
-            mt: 'auto', 
-            borderRadius: 2,
-            background: 'linear-gradient(90deg, #d97706, #f59e0b)'
-          }} />
-        </GlassCard>
+
+          <StatusIndicator sx={{ bgcolor: theme.palette.warning.main }} />
+        </AnimatedGradientCard>
       </Grid>
-      
-      <Grid item xs={12} sm={6} md={3}>
-        <GlassCard sx={{ 
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(52, 211, 153, 0.05))'
-            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(16, 185, 129, 0.05))',
+
+      <Grid item xs={6} sm={6} md={3}>
+        <AnimatedGradientCard sx={{ 
+          position: 'relative',
+          p: isMobile ? 1.5 : 3, 
         }}>
-          <Box display="flex" alignItems="center" mb={2} flexWrap={isXs ? 'wrap' : 'nowrap'}>
-            <IconContainer sx={{ 
-              bgcolor: 'success.light', 
-              color: 'success.contrastText',
-              mb: isXs ? 1 : 0,
-              mr: isXs ? 0 : 2,
-              mx: isXs ? 'auto' : undefined
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 0.5,
+            flexDirection: isMobile ? 'column' : 'row',
+            textAlign: 'center',
+            width: '100%'
+          }}>
+            <Box sx={{ 
+              backgroundColor: alpha(theme.palette.success.main, 0.2),
+              borderRadius: '50%',
+              width: isMobile ? 32 : 56,
+              height: isMobile ? 32 : 56,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: isMobile ? 0 : 2,
+              mb: isMobile ? 1 : 0
             }}>
-              <CheckCircleIcon />
-            </IconContainer>
+              <CheckCircleIcon 
+                sx={{ 
+                  color: theme.palette.success.main,
+                  fontSize: isMobile ? 20 : 32, 
+                }} 
+              />
+            </Box>
             <Typography 
-              variant="h6" 
               color="success.main" 
-              fontWeight="medium"
-              textAlign={isXs ? 'center' : 'left'}
-              width={isXs ? '100%' : 'auto'}
+              variant={isMobile ? "body2" : "h5"}
+              sx={{ 
+                fontWeight: 'bold',
+                fontSize: isMobile ? '0.75rem' : undefined,
+                lineHeight: 1.1
+              }}
             >
               Low Risk
             </Typography>
           </Box>
+
           <Typography 
-            component="p" 
-            variant="h3" 
-            color="success.main" 
-            fontWeight="bold"
-            textAlign={isXs ? 'center' : 'left'}
+            variant={isMobile ? "h4" : "h2"} 
+            component="div" 
+            sx={{ 
+              color: theme.palette.success.main,
+              fontWeight: 'bold',
+              my: isMobile ? 0.5 : 2,
+              lineHeight: 1,
+              textAlign: isMobile ? 'center' : 'left',
+              fontSize: isMobile ? '2rem' : undefined,
+            }}
           >
             {lowRiskCount}
           </Typography>
+
           <Typography 
             variant="body2" 
+            color="text.secondary"
             sx={{ 
-              mt: 1, 
-              color: 'text.secondary',
-              textAlign: isXs ? 'center' : 'left'
+              mb: 1,
+              fontSize: isMobile ? '0.675rem' : '0.75rem',
+              textAlign: isMobile ? 'center' : 'left',
+              whiteSpace: 'nowrap'
             }}
           >
             Stable condition
           </Typography>
-          <Box sx={{ 
-            height: 4, 
-            width: '100%', 
-            mt: 'auto', 
-            borderRadius: 2,
-            background: 'linear-gradient(90deg, #047857, #10b981)'
-          }} />
-        </GlassCard>
+
+          <StatusIndicator sx={{ bgcolor: theme.palette.success.main }} />
+        </AnimatedGradientCard>
       </Grid>
     </Grid>
   );

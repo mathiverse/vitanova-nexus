@@ -1,4 +1,4 @@
-import { Chip, useTheme } from '@mui/material';
+import { Chip, useTheme, useMediaQuery } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 interface RiskBadgeProps {
@@ -10,6 +10,7 @@ interface RiskBadgeProps {
  */
 const RiskBadge = ({ level }: RiskBadgeProps) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const getColor = () => {
     switch (level) {
@@ -41,13 +42,24 @@ const RiskBadge = ({ level }: RiskBadgeProps) => {
   return (
     <Chip
       label={level}
+      color={
+        level === 'HIGH' ? 'error' :
+        level === 'MEDIUM' ? 'warning' : 'success'
+      }
       size="small"
       sx={{
         backgroundColor: bg,
         color: text,
-        fontWeight: 'bold',
+        fontWeight: 600,
         minWidth: 70,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        [theme.breakpoints.down('sm')]: {
+          fontSize: '0.75rem',
+          height: '24px',
+          '& .MuiChip-label': {
+            px: 1
+          }
+        }
       }}
     />
   );
